@@ -1,0 +1,39 @@
+# Cursor Privacy Mode - Ignore secrets and sensitive files
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Secrets and credentials
+**/secrets/
+**/.secrets/
+**/config/secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.secret
+*.credentials
+
+# Private keys and certificates
+**/*.private
+**/*.cert
+**/*.crt
+
+# API keys and tokens (hardcoded)
+**/api_keys.txt
+**/tokens.txt
+**/credentials.json
+
+# Database files with sensitive data
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files that might contain secrets
+*.bak
+*.backup
+*~
