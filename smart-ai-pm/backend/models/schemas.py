@@ -8,7 +8,7 @@ class Story(BaseModel):
 
 class Epic(BaseModel):
     id: Optional[int] = None
-    project_id: int
+    project_id: Optional[int] = None  # Can be None during generation, set when saving
     title: str
     stories: List[Story] = []
     total_story_points: int = 0

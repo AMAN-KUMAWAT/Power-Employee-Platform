@@ -1,6 +1,10 @@
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))  # Add root to path
+
+# Add backend directory to path for imports
+backend_dir = Path(__file__).parent
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
@@ -63,63 +67,108 @@ async def home(request: Request):
     <!DOCTYPE html>
     <html>
     <head><title>Smart AI PM Tool 🚀</title>
-    <style>body{font-family:Arial,sans-serif;padding:20px;max-width:1200px;margin:auto;background:#f5f5f5;}
-    .card{background:white;border-radius:8px;padding:20px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-    input,textarea{width:100%;padding:10px;margin:10px 0;box-sizing:border-box;border:1px solid #ddd;border-radius:4px;}
-    button{background:#007bff;color:white;padding:10px 20px;border:none;cursor:pointer;font-size:14px;border-radius:4px;margin:5px;}
-    button:hover{background:#0056b3;}
-    .btn-sm{padding:5px 10px;font-size:12px;}
-    .btn-success{background:#28a745;}
-    .btn-success:hover{background:#218838;}
-    table{width:100%;border-collapse:collapse;margin-top:20px;}
-    th,td{border:1px solid #ddd;padding:12px;text-align:left;}
-    th{background:#f4f4f4;font-weight:600;}
-    tr:hover{background:#f9f9f9;}
-    .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);}
-    .modal-content{background:white;margin:5% auto;padding:20px;border-radius:8px;width:90%;max-width:1000px;max-height:80vh;overflow-y:auto;}
-    .close{color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer;}
-    .close:hover{color:#000;}
-    .spinner{display:inline-block;width:20px;height:20px;border:3px solid #f3f3f3;border-top:3px solid #007bff;border-radius:50%;animation:spin 1s linear infinite;margin-right:10px;}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;padding:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);background-size:400% 400%;animation:gradient 15s ease infinite;min-height:100vh;position:relative;overflow-x:hidden;}
+    @keyframes gradient{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+    .bg-particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden;}
+    .particle{position:absolute;width:4px;height:4px;background:rgba(255,255,255,0.5);border-radius:50%;animation:float 20s infinite linear;}
+    @keyframes float{0%{transform:translateY(100vh) translateX(0);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-100vh) translateX(100px);opacity:0;}}
+    .container{max-width:1400px;margin:0 auto;padding:40px 20px;position:relative;z-index:1;}
+    .header{text-align:center;color:white;margin-bottom:50px;padding:30px;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,0.1);animation:fadeInDown 0.8s ease;}
+    @keyframes fadeInDown{from{opacity:0;transform:translateY(-30px);}to{opacity:1;transform:translateY(0);}}
+    .header h1{font-size:3.5rem;margin-bottom:15px;text-shadow:2px 2px 4px rgba(0,0,0,0.3);background:linear-gradient(45deg,#fff,#f0f0f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .header p{font-size:1.3rem;opacity:0.95;margin-top:10px;}
+    .header-icon{font-size:4rem;display:block;margin-bottom:10px;animation:bounce 2s infinite;}
+    @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;padding:35px;margin-bottom:30px;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.3);animation:fadeInUp 0.8s ease;transition:transform 0.3s ease,box-shadow 0.3s ease;}
+    .card:hover{transform:translateY(-5px);box-shadow:0 25px 70px rgba(0,0,0,0.4);}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+    .card h2{color:#333;font-size:2rem;margin-bottom:25px;display:flex;align-items:center;gap:10px;}
+    .card h2::before{content:'✨';font-size:1.5rem;}
+    input,textarea{width:100%;padding:15px;margin:12px 0;box-sizing:border-box;border:2px solid #e0e0e0;border-radius:12px;font-size:1rem;transition:all 0.3s ease;background:#fff;color:#333;font-family:inherit;}
+    input:focus,textarea:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 4px rgba(102,126,234,0.1);transform:scale(1.02);color:#333;}
+    input::placeholder,textarea::placeholder{color:#999;opacity:1;}
+    button{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:15px 30px;border:none;cursor:pointer;font-size:1rem;font-weight:600;border-radius:12px;margin:8px 5px;box-shadow:0 4px 15px rgba(102,126,234,0.4);transition:all 0.3s ease;position:relative;overflow:hidden;}
+    button::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,0.3);transform:translate(-50%,-50%);transition:width 0.6s,height 0.6s;}
+    button:hover::before{width:300px;height:300px;}
+    button:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(102,126,234,0.6);}
+    button:active{transform:translateY(0);}
+    .btn-sm{padding:10px 18px;font-size:0.9rem;}
+    .btn-success{background:linear-gradient(135deg,#28a745 0%,#20c997 100%);box-shadow:0 4px 15px rgba(40,167,69,0.4);}
+    .btn-success:hover{box-shadow:0 6px 20px rgba(40,167,69,0.6);}
+    table{width:100%;border-collapse:separate;border-spacing:0;margin-top:25px;background:white;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.1);}
+    th,td{border:none;padding:18px;text-align:left;}
+    th{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;font-weight:600;font-size:1rem;text-transform:uppercase;letter-spacing:0.5px;}
+    td{background:#fff;border-bottom:1px solid #f0f0f0;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#f8f9ff;transform:scale(1.01);transition:all 0.2s ease;}
+    .modal{display:none;position:fixed;z-index:2000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);animation:fadeIn 0.3s ease;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    .modal-content{background:white;margin:3% auto;padding:35px;border-radius:25px;width:95%;max-width:1100px;max-height:85vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,0.5);animation:slideIn 0.4s ease;position:relative;}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-50px) scale(0.9);}to{opacity:1;transform:translateY(0) scale(1);}}
+    .close{color:#aaa;float:right;font-size:35px;font-weight:bold;cursor:pointer;transition:all 0.3s ease;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+    .close:hover{color:#000;background:#f0f0f0;transform:rotate(90deg);}
+    .spinner{display:inline-block;width:50px;height:50px;border:5px solid #f3f3f3;border-top:5px solid #667eea;border-radius:50%;animation:spin 1s linear infinite;margin:20px auto;}
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-    .backlog-table{margin-top:20px;}
-    .backlog-table th{background:#667eea;color:white;}
-    .timeline{background:#e7f3ff;padding:15px;border-radius:4px;margin:20px 0;border-left:4px solid #007bff;}
-    .story-list{list-style:none;padding:0;margin:5px 0;}
-    .story-item{padding:5px 0;border-bottom:1px solid #eee;}
+    .backlog-table{margin-top:25px;background:white;border-radius:15px;overflow:hidden;}
+    .backlog-table th{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;font-size:1.1rem;padding:20px;}
+    .timeline{background:linear-gradient(135deg,#e7f3ff 0%,#f0f8ff 100%);padding:25px;border-radius:15px;margin:25px 0;border-left:6px solid #667eea;box-shadow:0 4px 15px rgba(102,126,234,0.2);font-size:1.1rem;}
+    .story-list{list-style:none;padding:0;margin:8px 0;}
+    .story-item{padding:10px 0;border-bottom:2px solid #f0f0f0;transition:all 0.2s ease;padding-left:25px;position:relative;}
+    .story-item::before{content:'📌';position:absolute;left:0;top:10px;}
+    .story-item:hover{background:#f8f9ff;padding-left:30px;border-left:4px solid #667eea;}
     .story-item:last-child{border-bottom:none;}
+    .icon-large{font-size:3rem;margin:10px;}
+    .action-buttons{display:flex;gap:10px;flex-wrap:wrap;}
+    .pulse{animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+    .loading-text{font-size:1.2rem;color:#667eea;font-weight:600;margin-top:15px;}
+    @media(max-width:768px){.header h1{font-size:2rem;}.card{padding:20px;}.action-buttons{flex-direction:column;width:100%;}button{width:100%;margin:5px 0;}}
     </style>
     </head>
     <body>
-    <h1>🚀 Smart AI PM Tool - Phase 2: AI Backlog Agent</h1>
+    <div class="bg-particles" id="particles"></div>
+    <div class="container">
+    <div class="header">
+        <span class="header-icon">🚀</span>
+        <h1>Smart AI PM Tool</h1>
+        <p>✨ AI-Powered Project Management & Backlog Generation ✨</p>
+        <p style="font-size:1rem;margin-top:15px;opacity:0.9;">Transform your project ideas into structured Agile backlogs instantly</p>
+    </div>
     
     <div class="card">
-    <h2>Create New Project</h2>
+    <h2><span>✨</span>Create New Project</h2>
     <form id="projectForm">
-        <input type="text" id="name" placeholder="Project Name" required>
-        <textarea id="summary" placeholder="Project Summary (used for AI backlog generation)..." rows="4" required></textarea>
-        <button type="submit">Create Project</button>
+        <input type="text" id="name" placeholder="🎯 Enter Project Name" required>
+        <textarea id="summary" placeholder="📝 Describe your project... Our AI will generate Epics, Stories, and Sprints automatically!" rows="5" required></textarea>
+        <button type="submit">✨ Create Project</button>
     </form>
     </div>
     
     <div class="card">
-    <h2>Projects</h2>
+    <h2><span>📁</span>Your Projects</h2>
     <table id="projectsTable">
-        <thead><tr><th>ID</th><th>Name</th><th>Summary</th><th>Created</th><th>Actions</th></tr></thead>
+        <thead><tr><th>#</th><th>📁 Name</th><th>📄 Summary</th><th>📅 Created</th><th>⚡ Actions</th></tr></thead>
         <tbody></tbody>
     </table>
+    </div>
     </div>
     
     <div id="backlogModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeBacklogModal()">&times;</span>
-        <h2 id="modalProjectName">Backlog</h2>
-        <div id="backlogLoading" style="text-align:center;padding:20px;">
-            <div class="spinner"></div> Generating backlog...
+        <h2 id="modalProjectName" style="margin-bottom:25px;color:#333;display:flex;align-items:center;gap:10px;"><span class="icon-large">📋</span><span>Backlog</span></h2>
+        <div id="backlogLoading" style="text-align:center;padding:40px;">
+            <div class="spinner"></div>
+            <div class="loading-text pulse">🤖 AI is generating your backlog...</div>
+            <p style="color:#666;margin-top:15px;">Creating Epics, Stories, and Sprint assignments</p>
         </div>
         <div id="backlogContent" style="display:none;">
             <div class="timeline" id="timelineEstimate"></div>
             <table class="backlog-table">
-                <thead><tr><th>Epic</th><th>Stories</th><th>Story Points</th><th>Sprint</th></tr></thead>
+                <thead><tr><th>🎯 Epic</th><th>📝 Stories</th><th>📊 Points</th><th>🏃 Sprint</th></tr></thead>
                 <tbody id="backlogTableBody"></tbody>
             </table>
         </div>
@@ -132,24 +181,44 @@ async def home(request: Request):
         div.textContent = text;
         return div.innerHTML;
     }
+    
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        for(let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+    }
+    
+    createParticles();
 
     async function loadProjects() {
         const res = await fetch('/projects');
         const projects = await res.json();
         const tbody = document.querySelector('#projectsTable tbody');
+        if(projects.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999;"><div style="font-size:3rem;margin-bottom:15px;">📭</div><p>No projects yet. Create your first project above!</p></td></tr>';
+            return;
+        }
         tbody.innerHTML = projects.map(p => 
             `<tr>
-                <td>${p.id}</td>
-                <td><strong>${escapeHtml(p.name)}</strong></td>
-                <td>${escapeHtml(p.summary)}</td>
+                <td><strong style="color:#667eea;font-size:1.2rem;">${p.id}</strong></td>
+                <td><strong style="font-size:1.1rem;color:#333;">${escapeHtml(p.name)}</strong></td>
+                <td style="max-width:400px;">${escapeHtml(p.summary)}</td>
                 <td>${new Date(p.created_at).toLocaleString()}</td>
                 <td>
-                    <button class="btn-sm btn-success" onclick="generateBacklog(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')">
-                        ✨ Generate Backlog
-                    </button>
-                    <button class="btn-sm" onclick="viewBacklog(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')">
-                        📋 View Backlog
-                    </button>
+                    <div class="action-buttons">
+                        <button class="btn-sm btn-success" onclick="generateBacklog(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')">
+                            ✨ Generate Backlog
+                        </button>
+                        <button class="btn-sm" onclick="viewBacklog(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')">
+                            📋 View Backlog
+                        </button>
+                    </div>
                 </td>
             </tr>`
         ).join('');
@@ -193,9 +262,11 @@ async def home(request: Request):
         document.getElementById('modalProjectName').textContent = projectName + ' - Backlog';
         
         document.getElementById('timelineEstimate').innerHTML = 
-            '<strong>⏱ Timeline Estimate:</strong> ' + (backlog.timeline_estimate || 'N/A') + ' | ' +
-            '<strong>📊 Total Story Points:</strong> ' + (backlog.total_story_points || 0) + ' | ' +
-            '<strong>🏃 Sprints:</strong> ' + (backlog.estimated_sprints || 0);
+            '<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;">' +
+            '<div><strong>⏱ Timeline:</strong> ' + (backlog.timeline_estimate || 'N/A') + '</div>' +
+            '<div><strong>📊 Story Points:</strong> <span style="color:#667eea;font-size:1.2rem;">' + (backlog.total_story_points || 0) + '</span></div>' +
+            '<div><strong>🏃 Sprints:</strong> <span style="color:#764ba2;font-size:1.2rem;">' + (backlog.estimated_sprints || 0) + '</span></div>' +
+            '</div>';
         
         const tbody = document.getElementById('backlogTableBody');
         tbody.innerHTML = backlog.epics.map(epic => {
