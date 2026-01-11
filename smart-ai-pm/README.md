@@ -2,6 +2,20 @@
 
 A smart project management application with AI integration.
 
+## 🎯 ONE-CLICK START (Hackathon Demo)
+
+**Windows**: Double-click `start.bat`
+**Mac/Linux**: `./start.sh`
+**Or**: `python run.py`
+
+**Auto-installs everything** → Web app live at http://localhost:8000
+
+## ✅ Demo Flow
+1. Open http://localhost:8000
+2. Fill "Project Name" + "Summary" 
+3. Click "Create Project" → See in table instantly
+4. 🎉 MVP Working!
+
 ## Setup
 
 1. Install dependencies:
